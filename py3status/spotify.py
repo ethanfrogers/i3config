@@ -13,6 +13,15 @@ class Py3status:
         - 'kill' method for py3status exit notification
         - 'on_click' method for click events from i3bar
     """
+    def __init__(self):
+        self.bus_name = 'org.mpris.MediaPlayer2.spotify'
+        self.object_path = '/org/mpris/MediaPlayer2'
+        self.interface_name = 'org.freedesktop.DBus.Properties'
+        self.dbus_interface = 'org.mpris.MediaPlayer2.Player'
+
+        self.bus = dbus.SessionBus()
+        self.spotify = self.bus.get_object(self.bus_name, self.object_path)
+        self.iface = dbus.Interface(self.spotify, self.interface_name)
 
     def kill(self, i3status_output_json, i3status_config):
         """
@@ -30,25 +39,14 @@ class Py3status:
         """
         reload(sys).setdefaultencoding('utf8')
 
-        bus_name = 'org.mpris.MediaPlayer2.spotify'
-        object_path = '/org/mpris/MediaPlayer2'
-        interface_name = 'org.freedesktop.DBus.Properties'
-        dbus_interface = 'org.mpris.MediaPlayer2.Player'
-
-        
-        bus = dbus.SessionBus()
-        spotify = bus.get_object(bus_name, object_path)
-        iface = dbus.Interface(spotify, interface_name)
-        # props = iface.Get(dbus_interface, 'Metadata')
-
         if event['name'] == 'pauseSpotify':
-            spotify.PlayPause()
+            self.spotify.PlayPause()
             system("killall -USR1 py3status")
         elif event['name'] == 'nextSpotify':
-            spotify.Next()
+            self.spotify.Next()
             system("killall -USR1 py3status")
         elif event['name'] == 'prevSpotify':
-            spotify.Previous()
+            self.spotify.Previous()
             system("killall -USR1 py3status")
         
         pass
@@ -60,17 +58,7 @@ class Py3status:
     def pauseSpotify(self, i3status_output_json, i3status_config):
         reload(sys).setdefaultencoding('utf8')
 
-        bus_name = 'org.mpris.MediaPlayer2.spotify'
-        object_path = '/org/mpris/MediaPlayer2'
-        interface_name = 'org.freedesktop.DBus.Properties'
-        dbus_interface = 'org.mpris.MediaPlayer2.Player'
-        status = ""
-        
-        bus = dbus.SessionBus()
-        spotify = bus.get_object(bus_name, object_path)
-        iface = dbus.Interface(spotify, interface_name)
-
-        status = iface.Get(dbus_interface, 'PlaybackStatus')
+        status = self.iface.Get(self.dbus_interface, 'PlaybackStatus')
         if status == 'Playing':
             text = "PAUSE"
         else:
@@ -85,19 +73,14 @@ class Py3status:
     def empty(self, i3status_output_json, i3status_config):
         reload(sys).setdefaultencoding('utf8')
 
-        bus_name = 'org.mpris.MediaPlayer2.spotify'
-        object_path = '/org/mpris/MediaPlayer2'
-        interface_name = 'org.freedesktop.DBus.Properties'
-        dbus_interface = 'org.mpris.MediaPlayer2.Player'
-
         artist_desc = 'xesam:artist'
         title_desc = 'xesam:title'
 
         try:
-            bus = dbus.SessionBus()
-            spotify = bus.get_object(bus_name, object_path)
-            iface = dbus.Interface(spotify, interface_name)
-            props = iface.Get(dbus_interface, 'Metadata')
+            # bus = dbus.SessionBus()
+            # spotify = bus.get_object(bus_name, object_path)
+            # iface = dbus.Interface(spotify, interface_name)
+            props = self.iface.Get(self.dbus_interface, 'Metadata')
 
             if(props.has_key(artist_desc)):
                 artist = props.get(artist_desc)[0]
