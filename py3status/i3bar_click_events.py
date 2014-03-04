@@ -78,12 +78,6 @@ class Py3status:
         """
         # CONFIGURE ME PLEASE, LOVE YOU BIG TIME !
         self.actions = {
-            "wireless wlan0" : {
-                1: [external_command, 'notify-send', "clicked"]
-            },
-            "spotify 0" : {
-                1: [external_command, 'notify-send', "next track"]
-            }
         }
 
     def on_click(self, i3status_output_json, i3status_config, event):

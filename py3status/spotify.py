@@ -19,9 +19,24 @@ class Py3status:
         self.interface_name = 'org.freedesktop.DBus.Properties'
         self.dbus_interface = 'org.mpris.MediaPlayer2.Player'
 
+        # self.bus = dbus.SessionBus()
+        # self.spotify = self.bus.get_object(self.bus_name, self.object_path)
+        # self.iface = dbus.Interface(self.spotify, self.interface_name)
+
+    def _initSpotify(self):
         self.bus = dbus.SessionBus()
         self.spotify = self.bus.get_object(self.bus_name, self.object_path)
         self.iface = dbus.Interface(self.spotify, self.interface_name)
+
+
+    def _isRunning(self):
+        try:
+            bus = dbus.SessionBus()
+            process = bus.get_object(self.bus_name, self.object_path)
+        except dbus.exceptions.DBusException, e:
+            return False
+
+        return True
 
     def kill(self, i3status_output_json, i3status_config):
         """
@@ -52,11 +67,22 @@ class Py3status:
         pass
 
     def nextSpotify(self, i3status_output_json, i3status_config):
+        if self._isRunning() == False:
+            response = {'full_text':'', 'name':'pauseSpotify','color':"#dcdccc"}
+            return (1, response)   
+
         response = {'full_text':'NEXT', 'name':'nextSpotify','color':"#60b48a"}
         return (2, response)
 
     def pauseSpotify(self, i3status_output_json, i3status_config):
         reload(sys).setdefaultencoding('utf8')
+
+        if self._isRunning() == False:
+            response = {'full_text':'', 'name':'pauseSpotify','color':"#dcdccc"}
+            return (1, response)   
+
+        if hasattr(self, 'dbus') == False:
+            self._initSpotify()
 
         status = self.iface.Get(self.dbus_interface, 'PlaybackStatus')
         if status == 'Playing':
@@ -67,6 +93,10 @@ class Py3status:
         return (1, response)
 
     def prevSpotify(self, i3status_output_json, i3status_config):
+        if self._isRunning() == False:
+            response = {'full_text':'', 'name':'pauseSpotify','color':"#dcdccc"}
+            return (1, response)   
+
         response = {'full_text':'PREV', 'name':'prevSpotify','color':"#60b48a"}
         return (0, response)
 
@@ -75,11 +105,14 @@ class Py3status:
 
         artist_desc = 'xesam:artist'
         title_desc = 'xesam:title'
+        if self._isRunning() == False:
+            response = {'full_text': '', 'name': 'spotify', 'instance': '0','color':"#dcdccc", "min_width":10}
+            return (3, response)
+
+        if hasattr(self, 'dbus') == False:
+            self._initSpotify()
 
         try:
-            # bus = dbus.SessionBus()
-            # spotify = bus.get_object(bus_name, object_path)
-            # iface = dbus.Interface(spotify, interface_name)
             props = self.iface.Get(self.dbus_interface, 'Metadata')
 
             if(props.has_key(artist_desc)):
@@ -96,5 +129,5 @@ class Py3status:
 
 
 
-        response = {'full_text': message, 'name': 'spotify', 'instance': '0','color':"#dcdccc"}
+        response = {'full_text': message, 'name': 'spotify', 'instance': '0','color':"#dcdccc", "min_width":10}
         return (3, response)
