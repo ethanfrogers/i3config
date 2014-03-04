@@ -72,7 +72,7 @@ class Py3status:
             return (1, response)   
 
         response = {'full_text':'NEXT', 'name':'nextSpotify','color':"#60b48a"}
-        return (2, response)
+        return (3, response)
 
     def pauseSpotify(self, i3status_output_json, i3status_config):
         reload(sys).setdefaultencoding('utf8')
@@ -90,7 +90,7 @@ class Py3status:
         else:
             text = "PLAY"
         response = {'full_text':text, 'name':'pauseSpotify','color':"#dcdccc"}
-        return (1, response)
+        return (2, response)
 
     def prevSpotify(self, i3status_output_json, i3status_config):
         if self._isRunning() == False:
@@ -98,7 +98,7 @@ class Py3status:
             return (1, response)   
 
         response = {'full_text':'PREV', 'name':'prevSpotify','color':"#60b48a"}
-        return (0, response)
+        return (1, response)
 
     def empty(self, i3status_output_json, i3status_config):
         reload(sys).setdefaultencoding('utf8')
@@ -130,4 +130,4 @@ class Py3status:
 
 
         response = {'full_text': message, 'name': 'spotify', 'instance': '0','color':"#dcdccc", "min_width":10}
-        return (3, response)
+        return (0, response)
