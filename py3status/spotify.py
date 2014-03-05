@@ -71,7 +71,7 @@ class Py3status:
             response = {'full_text':'', 'name':'pauseSpotify','color':"#dcdccc"}
             return (1, response)   
 
-        response = {'full_text':'NEXT', 'name':'nextSpotify','color':"#60b48a"}
+        response = {'full_text':'NEXT ' + u'\u25b6', 'name':'nextSpotify','color':"#e04614"}
         return (3, response)
 
     def pauseSpotify(self, i3status_output_json, i3status_config):
@@ -86,9 +86,9 @@ class Py3status:
 
         status = self.iface.Get(self.dbus_interface, 'PlaybackStatus')
         if status == 'Playing':
-            text = "PAUSE"
+            text = u'\u25FC' + " PAUSE"
         else:
-            text = "PLAY"
+            text = u'\u25B6' + " PLAY"
         response = {'full_text':text, 'name':'pauseSpotify','color':"#dcdccc"}
         return (2, response)
 
@@ -97,7 +97,7 @@ class Py3status:
             response = {'full_text':'', 'name':'pauseSpotify','color':"#dcdccc"}
             return (1, response)   
 
-        response = {'full_text':'PREV', 'name':'prevSpotify','color':"#60b48a"}
+        response = {'full_text':u'\u25c0' + ' PREV', 'name':'prevSpotify','color':"#e04614"}
         return (1, response)
 
     def empty(self, i3status_output_json, i3status_config):
@@ -121,7 +121,7 @@ class Py3status:
             if(props.has_key('xesam:title')):
                 title = props.get('xesam:title')
 
-            message = '%s - %s' % (artist, title)
+            message = u'\u266B' + ' %s - %s' % (artist, title)
         except dbus.exceptions.DBusException, e:
             message = 'SPOTIFY'
         except NameError, e:
